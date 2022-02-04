@@ -59,7 +59,7 @@ public class Neighbours extends Application {
     public void init() {
         //test();    // <---------------- Uncomment to TEST!
         // %-distribution of RED, BLUE and NONE
-        double[] dist = {0.25, 0.25, 0.50};
+        double[] dist = {0.5, 0.5, 0};
         // Number of locations (places) in world (must be a square)
         int nLocations = 900;   // Should also try 90 000
 
@@ -75,6 +75,7 @@ public class Neighbours extends Application {
         shuffle(distArray);
 
         world = array2Matrix(distArray,nLocations);
+        out.println(isActorSatisfied(world,distArray[0], 0,0));
 
         // Should be last
         fixScreenSize(nLocations);
@@ -123,6 +124,29 @@ public class Neighbours extends Application {
         }
         return matrix;
      }
+
+
+    boolean isActorSatisfied(Actor[][] arr, Actor a, int row, int col) { //Funkar inte riktigt som den ska så kolla på den. Ring mig om du har någon fråga :)
+        int colorCount = 0;
+        int surroundingCount = 0;
+        for (int r = row - 1; r <= row + 1; r++) {
+            for (int c = col - 1; c <= col + 1; c++) {
+                if (!(row == r && col == c) && isValidLocation(arr.length, r, c)) {
+                    if (arr[r][c].equals(a.color)) {
+                        colorCount++;
+                    }
+                    surroundingCount++;
+                }
+            }
+        }
+        if ((colorCount/surroundingCount) > 0.3){
+            a.isSatisfied = true;
+        }
+        return a.isSatisfied;
+    }
+
+
+    //Nästa är att avgöra vad som ska hända om det är null
 
 
     // ------- Testing -------------------------------------
