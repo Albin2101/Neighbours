@@ -59,16 +59,16 @@ public class Neighbours extends Application {
     public void init() {
         //test();    // <---------------- Uncomment to TEST!
         // %-distribution of RED, BLUE and NONE
-        double[] dist = {0.5, 0.5, 0};
+        double[] dist = {0.5, 0.5, 0.4};
         // Number of locations (places) in world (must be a square)
-        int nLocations = 900;   // Should also try 90 000
+        int nLocations = 90000;   // Should also try 90 000
 
         // TODO initialize the world
 
         Actor[] distArray = new Actor[nLocations];
         for (int i = 0; i < nLocations*dist[0]; i++){
             distArray[i] = new Actor(Color.RED);
-        }for (int j = (int)(nLocations*dist[0]+1); j < (2*nLocations)*dist[1]; j++){
+        }for (int j = (int)(nLocations*dist[0]); j < (2*nLocations)*dist[1]; j++){
             distArray[j] = new Actor(Color.BLUE);
         }
 
@@ -125,7 +125,6 @@ public class Neighbours extends Application {
         return matrix;
      }
 
-
     boolean isActorSatisfied(Actor[][] arr, Actor a, int row, int col) { //Funkar inte riktigt som den ska så kolla på den. Ring mig om du har någon fråga :)
         int colorCount = 0;
         int surroundingCount = 0;
@@ -145,9 +144,7 @@ public class Neighbours extends Application {
         return a.isSatisfied;
     }
 
-
     //Nästa är att avgöra vad som ska hända om det är null
-
 
     // ------- Testing -------------------------------------
 
