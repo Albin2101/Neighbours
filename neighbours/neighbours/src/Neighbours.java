@@ -59,9 +59,9 @@ public class Neighbours extends Application {
     public void init() {
         //test();    // <---------------- Uncomment to TEST!
         // %-distribution of RED, BLUE and NONE
-        double[] dist = {0.5, 0.5, 0.4};
+        double[] dist = {1.0, 0.0, 0.4};
         // Number of locations (places) in world (must be a square)
-        int nLocations = 90000;   // Should also try 90 000
+        int nLocations = 900;   // Should also try 90 000
 
         // TODO initialize the world
 
@@ -75,7 +75,7 @@ public class Neighbours extends Application {
         shuffle(distArray);
 
         world = array2Matrix(distArray,nLocations);
-        out.println(isActorSatisfied(world,distArray[0], 0,0));
+        out.println(isActorSatisfied(world,distArray[0], 0,0, 0.7));
 
         // Should be last
         fixScreenSize(nLocations);
@@ -90,7 +90,7 @@ public class Neighbours extends Application {
 
     // Check if inside world
     boolean isValidLocation(int size, int row, int col) {
-        return 0 <= row && row < size && 0 <= col && col < size;
+        return row >= 0  && row <= size && col >= 0  && col <= size;
     }
 
     // ----------- Utility methods -----------------
@@ -125,9 +125,11 @@ public class Neighbours extends Application {
         return matrix;
      }
 
-    boolean isActorSatisfied(Actor[][] arr, Actor a, int row, int col) { //Funkar inte riktigt som den ska så kolla på den. Ring mig om du har någon fråga :)
+    boolean isActorSatisfied(Actor[][] arr, Actor a, int row, int col, double threshold) { //Funkar inte riktigt som den ska så kolla på den. Ring mig om du har någon fråga :)
+        // tror den ska stämma, kan va saker innan detta som e skumma
         int colorCount = 0;
         int surroundingCount = 0;
+
         for (int r = row - 1; r <= row + 1; r++) {
             for (int c = col - 1; c <= col + 1; c++) {
                 if (!(row == r && col == c) && isValidLocation(arr.length, r, c)) {
@@ -138,11 +140,12 @@ public class Neighbours extends Application {
                 }
             }
         }
-        if ((colorCount/surroundingCount) > 0.3){
+        if ((colorCount/surroundingCount) > threshold){
             a.isSatisfied = true;
         }
         return a.isSatisfied;
     }
+
 
     //Nästa är att avgöra vad som ska hända om det är null
 
