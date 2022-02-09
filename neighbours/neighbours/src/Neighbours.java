@@ -10,6 +10,7 @@ import javafx.stage.Stage;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.round;
 import static java.lang.Math.sqrt;
@@ -32,7 +33,8 @@ public class Neighbours extends Application {
 
     class Actor {
         final Color color;        // Color an existing JavaFX class
-        boolean isSatisfied;      // false by default
+        boolean isSatisfied;
+        int row;// false by default
 
         Actor(Color color) {      // Constructor to initialize
 
@@ -49,6 +51,10 @@ public class Neighbours extends Application {
         // % of surrounding neighbours that are like me
         double threshold = 0.7;
 
+
+
+
+
         // TODO update world
     }
 
@@ -56,29 +62,34 @@ public class Neighbours extends Application {
     // Method automatically called by JavaFX runtime
     // That's why we must have "@Override" and "public" (just accept for now)
     @Override
-    public void init() {
+    public void init() throws InterruptedException {
         //test();    // <---------------- Uncomment to TEST!
         // %-distribution of RED, BLUE and NONE
-        double[] dist = {1.0, 0.0, 0.4};
+        double[] dist = {0.4, 0.4, 0.2};
         // Number of locations (places) in world (must be a square)
         int nLocations = 900;   // Should also try 90 000
 
         // TODO initialize the world
 
+
+        // blir problem när 2*nLocations*dist[1] = 0, allt blir vitt för den går från 0 till distlocation lol
         Actor[] distArray = new Actor[nLocations];
-        for (int i = 0; i < nLocations*dist[0]; i++){
+        for (int i = 0;                         i < nLocations*dist[0]; i++){
             distArray[i] = new Actor(Color.RED);
-        }for (int j = (int)(nLocations*dist[0]); j < (2*nLocations)*dist[1]; j++){
+        }
+        for (int j = (int) (nLocations*dist[0]); j < (2*nLocations)*dist[1]; j++){
             distArray[j] = new Actor(Color.BLUE);
+        }
+        for (int k = (int) ((2*nLocations)*dist[1]); k < nLocations; k++){
+            distArray[k] = new Actor(Color.WHITE);
         }
 
         shuffle(distArray);
-
-        world = array2Matrix(distArray,nLocations);
-        out.println(isActorSatisfied(world,distArray[0], 0,0, 0.7));
-
-        // Should be last
+        world = array2Matrix(distArray, nLocations);
+            // Should be last
         fixScreenSize(nLocations);
+
+
     }
 
     // ---------------  Methods ------------------------------
@@ -90,7 +101,11 @@ public class Neighbours extends Application {
 
     // Check if inside world
     boolean isValidLocation(int size, int row, int col) {
-        return row >= 0  && row <= size && col >= 0  && col <= size;
+        return row >= 0 &&
+                row <= size &&
+                col >= 0 &&
+                col <= size
+                ;
     }
 
     // ----------- Utility methods -----------------
@@ -126,14 +141,13 @@ public class Neighbours extends Application {
      }
 
     boolean isActorSatisfied(Actor[][] arr, Actor a, int row, int col, double threshold) { //Funkar inte riktigt som den ska så kolla på den. Ring mig om du har någon fråga :)
-        // tror den ska stämma, kan va saker innan detta som e skumma
         int colorCount = 0;
         int surroundingCount = 0;
 
         for (int r = row - 1; r <= row + 1; r++) {
             for (int c = col - 1; c <= col + 1; c++) {
                 if (!(row == r && col == c) && isValidLocation(arr.length, r, c)) {
-                    if (arr[r][c].equals(a.color)) {
+                    if ((arr[row][col].color).equals(arr[r][c].color)) {
                         colorCount++;
                     }
                     surroundingCount++;
@@ -146,8 +160,57 @@ public class Neighbours extends Application {
         return a.isSatisfied;
     }
 
+    Boolean allSatisified (Actor[][] arr, Actor a, int row, int col, double threshold, int nLocations) {
+            int amountSatisfied=0;
+            int amountOfWhites=0;
+            boolean allSatisfied=false;
+            for (int i= 0; i < sqrt(nLocations); i++){
+                for(int j= 0; j < sqrt(nLocations); j++) {
+                    if((arr[i][j].color).equals(Color.WHITE)){
+                        amountOfWhites++;
+                    } else{
+                        if(isActorSatisfied(arr,arr[j][i], 2,6, 0.7)==true){
+                            amountSatisfied++;
+                        }
+                    }
+                }
+            }
+            if(amountSatisfied==(nLocations-amountOfWhites)){
+                allSatisfied=true;
+            }
+        return allSatisfied;
+    }
 
-    //Nästa är att avgöra vad som ska hända om det är null
+    void swapActors(Actor distArray[], int nLocations){
+
+        //1. Gå igenom världen och notera vilka som är missnöjda (och nöjda).
+        //Här använder vi att minst 50% av grannarna skall ha samma färg.
+        //2. Gå igenom världen och spara index till alla tomma platser (null). Byt
+        //mellan rad/kolumn och index se Anteckningar/Arrayer.
+        //3. Shuffla de tomma platserna (indexen).
+        //4. Byt första tomma plats mot första missnöjda. Nästa tomma plats mot
+        //nästa missnöjda o.s.v.
+
+
+        /*
+        int räknare = 0;
+        for (int i = 0; i < nLocations ; i++){
+            if (!(distArray[i].isSatisfied) ){
+                for (int j = 0; j <nLocations ; j++) {
+                    if (distArray[j].color == Color.WHITE) {
+                        distArray[j] = distArray[i];
+                        distArray[j] = new Actor(Color.WHITE);
+                        räknare ++;
+                    }
+                }
+            }
+        }
+        out.print(räknare);
+        */
+
+    }
+
+
 
     // ------- Testing -------------------------------------
 
